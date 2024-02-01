@@ -1,0 +1,40 @@
+{
+  "name": "unplugin-parcel-macros",
+  "version": "0.0.0",
+  "main": "unplugin-macros.js",
+  "types": "unplugin-macros.d.ts",
+  "napi": {
+    "name": "unplugin-parcel-macros",
+    "triples": {
+      "additional": [
+        "aarch64-apple-darwin",
+        "aarch64-unknown-linux-gnu",
+        "aarch64-unknown-linux-musl",
+        "x86_64-unknown-linux-musl"
+      ]
+    }
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@napi-rs/cli": "^2.18.0"
+  },
+  "engines": {
+    "node": ">= 18"
+  },
+  "scripts": {
+    "artifacts": "napi artifacts",
+    "build": "napi build --platform --release",
+    "build:debug": "napi build --platform",
+    "prepublishOnly": "napi prepublish -t npm",
+    "universal": "napi universal",
+    "version": "napi version"
+  },
+  "packageManager": "yarn@4.1.0",
+  "dependencies": {
+    "@parcel/core": "^2.11.0",
+    "@parcel/fs": "^2.11.0",
+    "@parcel/package-manager": "^2.11.0",
+    "@parcel/source-map": "^2.1.1",
+    "unplugin": "^1.6.0"
+  }
+}
