@@ -20,14 +20,6 @@ use swc_core::{
 };
 use swc_error_reporters::{GraphicalReportHandler, PrettyEmitter};
 
-#[cfg(target_os = "macos")]
-#[global_allocator]
-static GLOBAL: jemallocator::Jemalloc = jemallocator::Jemalloc;
-
-#[cfg(windows)]
-#[global_allocator]
-static ALLOC: mimalloc::MiMalloc = mimalloc::MiMalloc;
-
 #[napi]
 pub enum Type {
   JS,

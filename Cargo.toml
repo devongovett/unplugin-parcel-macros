@@ -25,12 +25,6 @@ swc_core = { version = "0.89.6", features = [
 ] }
 swc_error_reporters = "0.17.12"
 
-[target.'cfg(target_os = "macos")'.dependencies]
-jemallocator = { version = "0.3.2", features = ["disable_initial_exec_tls"] }
-
-[target.'cfg(windows)'.dependencies]
-mimalloc = { version = "0.1.25", default-features = false }
-
 [build-dependencies]
 napi-build = "2.0.1"
 
