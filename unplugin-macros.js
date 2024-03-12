@@ -23,9 +23,13 @@ module.exports = createUnplugin(() => {
     name: 'unplugin-macros',
     enforce: 'pre',
     transformInclude(id) {
-      return /.(js|jsx|ts|tsx)$/.test(id) && !id.includes('/node_modules/');
+      return /\.(js|jsx|ts|tsx)$/.test(id) && !id.includes('/node_modules/');
     },
     async transform(code, filePath) {
+      if (!/with[\s\n]*\{\s*type:[\s\n]*['"]macro['"][\s\n]*\}/.test(code)) {
+        return;
+      }
+
       // Remove old assets.
       let currentAssets = assetsByFile.get(filePath);
       if (currentAssets) {
@@ -133,10 +137,11 @@ module.exports = createUnplugin(() => {
         return id;
       }
     },
+    loadInclude(id) {
+      return assets.has(id);
+    },
     load(id) {
-      if (assets.has(id)) {
-        return assets.get(id).content;
-      }
+      return assets.get(id).content;
     },
     watchChange(id) {
       let macroDep = watch.get(id);
