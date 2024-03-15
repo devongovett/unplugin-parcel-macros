@@ -88,7 +88,7 @@ export default {
 
 ```js
 import {build} from 'esbuild';
-import optimizeLocales from 'unplugin-parcel-macros';
+import macros from 'unplugin-parcel-macros';
 
 build({
   plugins: [
