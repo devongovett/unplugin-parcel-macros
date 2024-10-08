@@ -5,7 +5,6 @@ use std::sync::{Arc, Mutex};
 use swc_core::common::{BytePos, LineCol};
 use swc_core::ecma::codegen::text_writer::JsWriter;
 use swc_core::ecma::codegen::Emitter;
-use swc_core::ecma::parser::EsConfig;
 use swc_core::{common::errors::Handler, ecma::visit::FoldWith};
 use swc_core::{
   common::{
@@ -14,7 +13,7 @@ use swc_core::{
   },
   ecma::{
     ast::{Module, ModuleItem, Program},
-    parser::{Parser, StringInput, Syntax, TsConfig},
+    parser::{EsSyntax, Parser, StringInput, Syntax, TsSyntax},
     transforms::base::resolver,
   },
 };
@@ -61,19 +60,19 @@ fn transform_internal(
   call_macro: MacroCallback,
 ) -> Result<TransformResult, napi::Error> {
   let source_map = Lrc::new(SourceMap::default());
-  let source_file = source_map.new_source_file(FileName::Real("test.js".into()), code);
+  let source_file = source_map.new_source_file(Lrc::new(FileName::Real("test.js".into())), code);
   let comments = SingleThreadedComments::default();
   let mut parser = Parser::new(
     match ty {
       Type::JS | Type::JSX => {
-        Syntax::Es(EsConfig {
+        Syntax::Es(EsSyntax {
           // always enable JSX in .js files?
           jsx: true,
           import_attributes: true,
           ..Default::default()
         })
       }
-      Type::TS | Type::TSX => Syntax::Typescript(TsConfig {
+      Type::TS | Type::TSX => Syntax::Typescript(TsSyntax {
         tsx: matches!(ty, Type::TSX),
         ..Default::default()
       }),
