@@ -15,10 +15,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - name: Enable Corepack
-        run: corepack enable
       - name: Setup node
         uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Enable Corepack
+        run: corepack enable
       - name: Install
         uses: dtolnay/rust-toolchain@stable
       - name: Cache cargo
@@ -30,7 +32,7 @@ jobs:
             ~/.cargo/git/db/
             .cargo-cache
             target/
-          key: ${{ matrix.settings.target }}-cargo-${{ matrix.settings.host }}
+          key: cargo-${{ matrix.os }}
       - name: Install dependencies
         run: yarn install
       - run: yarn build
