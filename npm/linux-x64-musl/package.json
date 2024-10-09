@@ -1,6 +1,6 @@
 {
   "name": "unplugin-parcel-macros-linux-x64-musl",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "os": [
     "linux"
   ],
