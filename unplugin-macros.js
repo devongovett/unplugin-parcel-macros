@@ -75,7 +75,7 @@ module.exports = createUnplugin(() => {
             for (let asset of macroAssets) {
               let hash = crypto.createHash('sha256');
               hash.update(asset.content);
-              let id = `${filePath}.macro-${hash.digest('hex')}.${asset.type}`;
+              let id = `macro-${hash.digest('hex')}.${asset.type}`;
               assets.set(id, asset);
               currentAssets.push(id);
               imports.push(`import "${id}";`);
