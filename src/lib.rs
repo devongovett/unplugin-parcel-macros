@@ -31,6 +31,7 @@ pub enum Type {
 pub fn transform(
   env: Env,
   ty: Type,
+  filename: String,
   code: String,
   call_macro: JsFunction,
 ) -> napi::Result<JsObject> {
@@ -38,7 +39,7 @@ pub fn transform(
   let (deferred, promise) = env.create_deferred()?;
 
   rayon::spawn(move || {
-    let res = transform_internal(ty, code, call_macro);
+    let res = transform_internal(ty, filename, code, call_macro);
     match res {
       Ok(result) => deferred.resolve(move |_| Ok(result)),
       Err(err) => deferred.reject(err.into()),
@@ -56,11 +57,12 @@ struct TransformResult {
 
 fn transform_internal(
   ty: Type,
+  filename: String,
   code: String,
   call_macro: MacroCallback,
 ) -> Result<TransformResult, napi::Error> {
   let source_map = Lrc::new(SourceMap::default());
-  let source_file = source_map.new_source_file(Lrc::new(FileName::Real("test.js".into())), code);
+  let source_file = source_map.new_source_file(Lrc::new(FileName::Real(filename.into())), code);
   let comments = SingleThreadedComments::default();
   let mut parser = Parser::new(
     match ty {

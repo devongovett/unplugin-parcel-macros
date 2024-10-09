@@ -13,7 +13,7 @@ export const enum Type {
   TS = 2,
   TSX = 3
 }
-export declare function transform(ty: Type, code: string, callMacro: (...args: any[]) => any): object
+export declare function transform(ty: Type, filename: string, code: string, callMacro: (...args: any[]) => any): object
 export interface TransformResult {
   code: string
   map: string

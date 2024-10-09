@@ -41,7 +41,7 @@ module.exports = createUnplugin(() => {
       assetsByFile.set(filePath, currentAssets);
 
       let imports = [];
-      let res = await transform(types[path.extname(filePath)], code, async (_err, src, exportName, args, loc) => {
+      let res = await transform(types[path.extname(filePath)], filePath, code, async (_err, src, exportName, args, loc) => {
         let mod;
         try {
           mod = await packageManager.require(src, filePath);
