@@ -64,6 +64,7 @@ module.exports = createUnplugin(() => {
           if (typeof mod[exportName] === 'function') {
             let macroAssets = [];
             let result = mod[exportName].apply({
+              loc,
               addAsset(asset) {
                 macroAssets.push(asset);
               },
