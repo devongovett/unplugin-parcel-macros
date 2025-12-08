@@ -119,7 +119,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: bindings-${{ matrix.settings.target }}
-          path: ${{ env.APP_NAME }}.{*.node,wasm}
+          path: |
+            ${{ env.APP_NAME }}.*.node
+            ${{ env.APP_NAME }}.wasm
           if-no-files-found: error
 
   publish:
@@ -145,7 +147,7 @@ jobs:
       - name: Move artifacts
         run: |
           yarn artifacts
-          mv artifacts/bindings-unplugin-parcel-macros.wasm unplugin_parcel_macros.wasm
+          mv artifacts/bindings-wasm32-unknown-unknown/unplugin-parcel-macros.wasm unplugin-parcel-macros.wasm
       - name: List packages
         run: ls -R ./npm
         shell: bash

@@ -17,7 +17,7 @@ const State = {
 let initPromise, transformAsync;
 
 async function init() {
-  let buffer = fs.readFileSync(new URL('unplugin_parcel_macros.wasm', import.meta.url));
+  let buffer = fs.readFileSync(new URL('unplugin-parcel-macros.wasm', import.meta.url));
   let {instance} = await WebAssembly.instantiate(buffer, {
     env: {
       ...napi,
