@@ -27,6 +27,9 @@ swc_core = { version = "0.106", features = [
 ] }
 swc_error_reporters = "1.0.0"
 
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+getrandom = { version = "0.2", features = ["custom"], default-features = false }
+
 [build-dependencies]
 napi-build = "2.0.1"
 

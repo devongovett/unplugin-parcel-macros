@@ -45,6 +45,14 @@ jobs:
               set -e &&
               rustup target add aarch64-unknown-linux-musl &&
               yarn build --target aarch64-unknown-linux-musl
+          - host: ubuntu-latest
+            target: wasm32-unknown-unknown
+            build: |-
+              curl -L -O https://github.com/WebAssembly/binaryen/releases/download/version_125/binaryen-version_125-x86_64-linux.tar.gz
+              tar -xf binaryen-version_125-x86_64-linux.tar.gz
+              export PATH="$PATH:./binaryen-version_125/bin"
+              rustup target add wasm32-unknown-unknown
+              yarn build:wasm
     name: stable - ${{ matrix.settings.target }} - node@20
     runs-on: ${{ matrix.settings.host }}
     steps:
@@ -111,7 +119,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: bindings-${{ matrix.settings.target }}
-          path: ${{ env.APP_NAME }}.*.node
+          path: ${{ env.APP_NAME }}.{*.node,wasm}
           if-no-files-found: error
 
   publish:
@@ -135,7 +143,9 @@ jobs:
         with:
           path: artifacts
       - name: Move artifacts
-        run: yarn artifacts
+        run: |
+          yarn artifacts
+          mv artifacts/bindings-unplugin-parcel-macros.wasm unplugin_parcel_macros.wasm
       - name: List packages
         run: ls -R ./npm
         shell: bash

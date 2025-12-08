@@ -1,8 +1,14 @@
 {
   "name": "unplugin-parcel-macros",
-  "version": "0.1.1",
+  "version": "0.1.2-alpha.0",
   "main": "unplugin-macros.js",
   "types": "unplugin-macros.d.ts",
+  "imports": {
+    "#native": {
+      "node-addons": "./index.js",
+      "default": "./wasm.js"
+    }
+  },
   "napi": {
     "name": "unplugin-parcel-macros",
     "triples": {
@@ -29,6 +35,7 @@
     "artifacts": "napi artifacts",
     "build": "napi build --platform --release",
     "build:debug": "napi build --platform",
+    "build:wasm": "cargo build --target wasm32-unknown-unknown --release && wasm-opt target/wasm32-unknown-unknown/release/unplugin_parcel_macros.wasm --all-features --asyncify --pass-arg=asyncify-imports@env.await_promise_sync -Oz -o unplugin_parcel_macros.wasm",
     "prepublishOnly": "napi prepublish -t npm",
     "universal": "napi universal",
     "version": "napi version"
@@ -39,6 +46,7 @@
     "@parcel/fs": "^2.12.0",
     "@parcel/package-manager": "^2.12.0",
     "@parcel/source-map": "^2.1.1",
+    "napi-wasm": "^1.0.1",
     "unplugin": "^1.9.0"
   }
 }

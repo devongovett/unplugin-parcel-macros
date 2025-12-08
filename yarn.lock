@@ -1485,6 +1485,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"napi-wasm@npm:^1.0.1":
+  version: 1.1.3
+  resolution: "napi-wasm@npm:1.1.3"
+  checksum: 10c0/7c365ab9dc59e6f20d7b7886279ecc03ffc7c3d502ed66d32652e3681c3a56c372f00f29b110aefd9b074a6bab6a997e9b602968c18622e2586818f417e41a5d
+  languageName: node
+  linkType: hard
+
 "negotiator@npm:^0.6.3":
   version: 0.6.3
   resolution: "negotiator@npm:0.6.3"
@@ -1850,6 +1857,7 @@ __metadata:
     "@parcel/fs": "npm:^2.12.0"
     "@parcel/package-manager": "npm:^2.12.0"
     "@parcel/source-map": "npm:^2.1.1"
+    napi-wasm: "npm:^1.0.1"
     unplugin: "npm:^1.9.0"
   languageName: unknown
   linkType: soft

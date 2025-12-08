@@ -1,5 +1,5 @@
 const {createUnplugin} = require('unplugin');
-const {Type, transform} = require('./index');
+const {Type, transform} = require('#native');
 const {NodePackageManager} = require('@parcel/package-manager');
 const {NodeFS} = require('@parcel/fs');
 const path = require('path');
