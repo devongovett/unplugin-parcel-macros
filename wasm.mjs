@@ -14,9 +14,9 @@ const State = {
   Rewinding: 2
 };
 
-let initPromise, transformAsync;
+let initPromise, transformAsync, ResolverWasm;
 
-async function init() {
+export async function init() {
   let buffer = fs.readFileSync(new URL('unplugin-parcel-macros.wasm', import.meta.url));
   let {instance} = await WebAssembly.instantiate(buffer, {
     env: {
@@ -99,11 +99,16 @@ async function init() {
     assertNoneState();
     return res;
   };
+
+  ResolverWasm = exports.Resolver;
 }
 
 export async function transform(...args) {
   initPromise ||= init();
   await initPromise;
-  console.log('wasm')
   return transformAsync(...args);
+}
+
+export function Resolver(...args) {
+  return new ResolverWasm(...args);
 }

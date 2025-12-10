@@ -6,7 +6,11 @@
   "imports": {
     "#native": {
       "node-addons": "./index.js",
-      "default": "./wasm.js"
+      "default": "./wasm.mjs"
+    },
+    "#source-map": {
+      "node-addons": "@parcel/source-map",
+      "default": "@parcel/source-map/dist/wasm.js"
     }
   },
   "napi": {
@@ -42,10 +46,8 @@
   },
   "packageManager": "yarn@4.1.0",
   "dependencies": {
-    "@parcel/core": "^2.12.0",
-    "@parcel/fs": "^2.12.0",
-    "@parcel/package-manager": "^2.12.0",
     "@parcel/source-map": "^2.1.1",
+    "@swc/core": "^1.15.3",
     "napi-wasm": "^1.0.1",
     "unplugin": "^1.9.0"
   }

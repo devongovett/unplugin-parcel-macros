@@ -295,7 +295,8 @@ if (!nativeBinding) {
   throw new Error(`Failed to load native binding`)
 }
 
-const { Type, transform } = nativeBinding
+const { Resolver, Type, transform } = nativeBinding
 
+module.exports.Resolver = Resolver
 module.exports.Type = Type
 module.exports.transform = transform

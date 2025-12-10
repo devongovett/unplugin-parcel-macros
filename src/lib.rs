@@ -14,8 +14,8 @@ use swc_core::ecma::codegen::Emitter;
 use swc_core::{common::errors::Handler, ecma::visit::FoldWith};
 use swc_core::{
   common::{
-    chain, comments::SingleThreadedComments, source_map::SourceMapGenConfig, sync::Lrc, FileName,
-    Globals, Mark, SourceMap,
+    comments::SingleThreadedComments, source_map::SourceMapGenConfig, sync::Lrc, FileName, Globals,
+    Mark, SourceMap,
   },
   ecma::{
     ast::{Module, ModuleItem, Program},
@@ -23,7 +23,10 @@ use swc_core::{
     transforms::base::resolver,
   },
 };
-use swc_error_reporters::{GraphicalReportHandler, PrettyEmitter};
+use swc_error_reporters::handler::{to_pretty_handler, ThreadSafetyDiagnostics};
+use swc_error_reporters::{ErrorEmitter, GraphicalReportHandler, ToPrettyDiagnostic};
+
+mod resolver;
 
 #[napi]
 pub enum Type {
@@ -90,11 +93,12 @@ pub fn transform(
     loc: Location,
   ) -> napi::Result<Result<JsValue, MacroError>> {
     let call_macro: JsFunction = env.get_reference_value_unchecked(&fn_ref)?;
+    let null = env.get_null()?.into_unknown();
     let src = env.create_string_from_std(src)?.into_unknown();
     let export = env.create_string_from_std(export)?.into_unknown();
     let args = js_value_to_napi(JsValue::Array(args), env)?;
     let loc = env.to_js_value(&loc)?;
-    let value: JsUnknown = call_macro.call(None, &[src, export, args, loc])?;
+    let value: JsUnknown = call_macro.call(None, &[null, src, export, args, loc])?;
 
     if value.is_promise()? {
       let mut result = std::ptr::null_mut();
@@ -173,21 +177,31 @@ fn transform_internal(
     Some(&comments),
   );
 
-  let wr = Box::new(LockedWriter::default());
-  let emitter = PrettyEmitter::new(
-    source_map.clone(),
-    wr.clone(),
-    GraphicalReportHandler::new().with_context_lines(3),
-    Default::default(),
-  );
+  let mut diagnostics = ThreadSafetyDiagnostics::default();
+  let emitter = ErrorEmitter {
+    diagnostics: diagnostics.clone(),
+    cm: source_map.clone(),
+    opts: Default::default(),
+  };
+
   let handler: Handler = Handler::with_emitter(true, false, Box::new(emitter));
 
-  let module = match parser.parse_program() {
+  let mut module = match parser.parse_program() {
     Ok(m) => m,
     Err(e) => {
       e.into_diagnostic(&handler).emit();
-      let s = &*wr.0.lock().unwrap().clone();
-      return Err(napi::Error::new(napi::Status::GenericFailure, s));
+      let report_handler = GraphicalReportHandler::default();
+      let diagnostics = diagnostics.take();
+      let diagnostics_pretty_message = diagnostics
+        .iter()
+        .map(|d| d.to_pretty_diagnostic(&source_map, false))
+        .map(|d| d.to_pretty_string(&report_handler))
+        .collect::<Vec<String>>()
+        .join("");
+      return Err(napi::Error::new(
+        napi::Status::GenericFailure,
+        diagnostics_pretty_message,
+      ));
     }
   };
 
@@ -196,10 +210,8 @@ fn transform_internal(
     let global_mark = Mark::fresh(Mark::root());
     let unresolved_mark = Mark::fresh(Mark::root());
 
-    module.fold_with(&mut chain!(
-      resolver(unresolved_mark, global_mark, false),
-      &mut Macros::new(call_macro, &source_map, &mut errors)
-    ))
+    module.mutate(resolver(unresolved_mark, global_mark, false));
+    module.fold_with(&mut Macros::new(call_macro, &source_map, &mut errors))
   });
 
   if !errors.is_empty() {
@@ -225,8 +237,20 @@ fn transform_internal(
         }
       }
     }
-    let s = &*wr.0.lock().unwrap().clone();
-    return Err(napi::Error::new(napi::Status::GenericFailure, s));
+
+    let report_handler = GraphicalReportHandler::default();
+    let diagnostics = diagnostics.take();
+    let diagnostics_pretty_message = diagnostics
+      .iter()
+      .map(|d| d.to_pretty_diagnostic(&source_map, false))
+      .map(|d| d.to_pretty_string(&report_handler))
+      .collect::<Vec<String>>()
+      .join("");
+
+    return Err(napi::Error::new(
+      napi::Status::GenericFailure,
+      diagnostics_pretty_message,
+    ));
   }
 
   let module = match module {
@@ -249,15 +273,6 @@ fn transform_internal(
     code: String::from_utf8(buf).unwrap(),
     map: String::from_utf8(map_buf).unwrap(),
   })
-}
-
-#[derive(Clone, Default)]
-struct LockedWriter(Arc<Mutex<String>>);
-impl std::fmt::Write for LockedWriter {
-  fn write_str(&mut self, s: &str) -> std::fmt::Result {
-    self.0.lock().unwrap().push_str(s);
-    Ok(())
-  }
 }
 
 // Exclude macro expansions from source maps.
