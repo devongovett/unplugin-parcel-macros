@@ -1,6 +1,6 @@
 # unplugin-parcel-macros
 
-An [Unplugin](https://unplugin.vercel.app) that lets you use Parcel's [macro](https://parceljs.org/features/macros/) implementation in webpack, Vite, Rollup, esbuild, Next.js, and more.
+An [Unplugin](https://unplugin.unjs.io/) that lets you use Parcel's [macro](https://parceljs.org/features/macros/) implementation in webpack, Vite, Rollup, esbuild, Next.js, and more.
 
 Macros are JavaScript functions that run at build time. The value returned by a macro is inlined into the bundle in place of the original function call. This allows you to generate constants, code, and even additional assets without any custom plugins.
 
