@@ -39,7 +39,7 @@
     "artifacts": "napi artifacts",
     "build": "napi build --platform --release",
     "build:debug": "napi build --platform",
-    "build:wasm": "cargo build --target wasm32-unknown-unknown --release && wasm-opt target/wasm32-unknown-unknown/release/unplugin_parcel_macros.wasm --all-features --asyncify --pass-arg=asyncify-imports@env.await_promise_sync -Oz -o unplugin-parcel-macros.wasm",
+    "build:wasm": "cargo build --target wasm32-unknown-unknown --release && wasm-opt target/wasm32-unknown-unknown/release/unplugin_parcel_macros.wasm --all-features --asyncify --pass-arg=asyncify-imports@env.await_promise_sync --pass-arg=asyncify-stack-size@65536 -Oz -o unplugin-parcel-macros.wasm",
     "prepublishOnly": "napi prepublish -t npm",
     "universal": "napi universal",
     "version": "napi version"

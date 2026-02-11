@@ -51,9 +51,9 @@ export async function init() {
 
   // allocate __asyncify_data
   // Stack data goes right after the initial descriptor.
-  let DATA_ADDR = instance.exports.napi_wasm_malloc(8 + 4096);
+  let DATA_ADDR = instance.exports.napi_wasm_malloc(8 + 65536);
   let DATA_START = DATA_ADDR + 8;
-  let DATA_END = DATA_ADDR + 8 + 4096;
+  let DATA_END = DATA_ADDR + 8 + 65536;
   new Int32Array(env.memory.buffer, DATA_ADDR).set([DATA_START, DATA_END]);
 
   function assertNoneState() {
