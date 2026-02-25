@@ -6,7 +6,7 @@ use std::{
 };
 
 use napi::{
-  bindgen_prelude::Either3, Env, JsBuffer, JsFunction, JsNumber, JsObject, JsString, JsUnknown,
+  bindgen_prelude::Either3, Env, JsBuffer, JsFunction, JsNumber, JsString, JsUnknown,
   Ref, Result,
 };
 use napi_derive::napi;

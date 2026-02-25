@@ -1,14 +1,9 @@
 use indexmap::IndexMap;
-use napi::bindgen_prelude::FromNapiValue;
-use napi::{
-  Env, JsBoolean, JsFunction, JsNumber, JsObject, JsString, JsUnknown, NapiRaw, NapiValue, Ref,
-  ValueType,
-};
+use napi::{Env, JsBoolean, JsFunction, JsNumber, JsObject, JsString, ValueType};
 use napi_derive::napi;
+use parcel_macros::JsValue;
 use parcel_macros::{napi::create_macro_callback, MacroCallback, MacroError, Macros};
-use parcel_macros::{JsValue, Location};
-use std::sync::{Arc, Mutex};
-use swc_core::common::{BytePos, LineCol, DUMMY_SP};
+use swc_core::common::{BytePos, LineCol};
 use swc_core::ecma::codegen::text_writer::JsWriter;
 use swc_core::ecma::codegen::Emitter;
 use swc_core::{common::errors::Handler, ecma::visit::FoldWith};
@@ -23,7 +18,7 @@ use swc_core::{
     transforms::base::resolver,
   },
 };
-use swc_error_reporters::handler::{to_pretty_handler, ThreadSafetyDiagnostics};
+use swc_error_reporters::handler::ThreadSafetyDiagnostics;
 use swc_error_reporters::{ErrorEmitter, GraphicalReportHandler, ToPrettyDiagnostic};
 
 mod resolver;
