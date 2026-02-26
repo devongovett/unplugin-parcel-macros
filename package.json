@@ -1,6 +1,6 @@
 {
   "name": "unplugin-parcel-macros",
-  "version": "0.1.2-alpha.1",
+  "version": "0.2.0",
   "main": "unplugin-macros.js",
   "types": "unplugin-macros.d.ts",
   "imports": {
