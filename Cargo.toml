@@ -13,11 +13,9 @@ parcel-macros = { git = "https://github.com/parcel-bundler/parcel.git", features
 indexmap = "1.9.2"
 rayon = "1.7.0"
 crossbeam-channel = "0.5.6"
-swc_core = { version = "0.106", features = [
+swc_core = { version = "21", features = [
   "common",
-  "common_ahash",
   "common_sourcemap",
-  "common_concurrent",
   "ecma_ast",
   "ecma_parser",
   "ecma_visit",
@@ -25,7 +23,14 @@ swc_core = { version = "0.106", features = [
   "ecma_codegen",
   "ecma_utils"
 ] }
-swc_error_reporters = "1.0.0"
+swc_error_reporters = "10.0.0"
+parcel-resolver = { git = "https://github.com/parcel-bundler/parcel.git" }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+parcel-dev-dep-resolver = { git = "https://github.com/parcel-bundler/parcel.git" }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+getrandom = { version = "0.2", features = ["custom"], default-features = false }
 
 [build-dependencies]
 napi-build = "2.0.1"

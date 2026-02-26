@@ -1,10 +1,9 @@
 const {createUnplugin} = require('unplugin');
-const {Type, transform} = require('./index');
-const {NodePackageManager} = require('@parcel/package-manager');
-const {NodeFS} = require('@parcel/fs');
+const {Type, transform} = require('#native');
+const NodePackageManager = require('./PackageManager');
 const path = require('path');
 const crypto = require('crypto');
-const SourceMap = require('@parcel/source-map').default;
+const { default: SourceMap, init: initSourceMap } = require('#source-map');
 
 const types = {
   '.js': Type.JS,
@@ -15,7 +14,7 @@ const types = {
 
 let assets = new Map();
 let assetsByFile = new Map();
-let packageManager = new NodePackageManager(new NodeFS(), process.cwd());
+let packageManager = new NodePackageManager(process.cwd());
 let watch = new Map();
 
 module.exports = createUnplugin(() => {
@@ -41,6 +40,7 @@ module.exports = createUnplugin(() => {
       assetsByFile.set(filePath, currentAssets);
 
       let imports = [];
+      await initSourceMap;
       let res = await transform(types[path.extname(filePath)], filePath, code, async (_err, src, exportName, args, loc) => {
         let mod;
         try {

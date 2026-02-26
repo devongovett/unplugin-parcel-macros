@@ -45,6 +45,14 @@ jobs:
               set -e &&
               rustup target add aarch64-unknown-linux-musl &&
               yarn build --target aarch64-unknown-linux-musl
+          - host: ubuntu-latest
+            target: wasm32-unknown-unknown
+            build: |-
+              curl -L -O https://github.com/WebAssembly/binaryen/releases/download/version_125/binaryen-version_125-x86_64-linux.tar.gz
+              tar -xf binaryen-version_125-x86_64-linux.tar.gz
+              export PATH="$PATH:./binaryen-version_125/bin"
+              rustup target add wasm32-unknown-unknown
+              yarn build:wasm
     name: stable - ${{ matrix.settings.target }} - node@20
     runs-on: ${{ matrix.settings.host }}
     steps:
@@ -102,6 +110,7 @@ jobs:
           options: '--user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build'
           run: |
             corepack enable
+            rustup update
             ${{ matrix.settings.build }}
       - name: Build
         run: ${{ matrix.settings.build }}
@@ -111,7 +120,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: bindings-${{ matrix.settings.target }}
-          path: ${{ env.APP_NAME }}.*.node
+          path: |
+            ${{ env.APP_NAME }}.*.node
+            ${{ env.APP_NAME }}.wasm
           if-no-files-found: error
 
   publish:
@@ -135,7 +146,9 @@ jobs:
         with:
           path: artifacts
       - name: Move artifacts
-        run: yarn artifacts
+        run: |
+          yarn artifacts
+          mv artifacts/bindings-wasm32-unknown-unknown/unplugin-parcel-macros.wasm unplugin-parcel-macros.wasm
       - name: List packages
         run: ls -R ./npm
         shell: bash
