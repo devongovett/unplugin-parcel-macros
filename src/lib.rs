@@ -63,6 +63,11 @@ pub fn transform(
   code: String,
   call_macro: JsFunction,
 ) -> napi::Result<TransformResult> {
+  use napi::{Ref, JsUnknown, NapiRaw, NapiValue, bindgen_prelude::FromNapiValue};
+  use parcel_macros::Location;
+  use swc_core::common::DUMMY_SP;
+  use std::sync::Arc;
+
   // This relies on Binaryen's Asyncify transform to allow Rust to call async JS functions from sync code.
   // See the comments in wasm.mjs for more details about how this works.
   extern "C" {
