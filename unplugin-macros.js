@@ -9,7 +9,8 @@ const types = {
   '.js': Type.JS,
   '.jsx': Type.JSX,
   '.ts': Type.TS,
-  '.tsx': Type.TSX
+  '.tsx': Type.TSX,
+  '.vue': Type.JS
 };
 
 let assets = new Map();
@@ -17,12 +18,17 @@ let assetsByFile = new Map();
 let packageManager = new NodePackageManager(process.cwd());
 let watch = new Map();
 
-module.exports = createUnplugin(() => {
+module.exports = createUnplugin((rawOptions = {}) => {
+  const options = {
+    enforce: 'enforce' in rawOptions ? rawOptions.enforce : 'pre',
+    include: rawOptions.include || /\.(js|jsx|ts|tsx)$/,
+    exclude: rawOptions.exclude || /\/node_modules\//,
+  };
   return {
     name: 'unplugin-macros',
-    enforce: 'pre',
+    enforce: options.enforce,
     transformInclude(id) {
-      return /\.(js|jsx|ts|tsx)$/.test(id) && !id.includes('/node_modules/');
+      return options.include.test(id) && !options.exclude.test(id);
     },
     async transform(code, filePath) {
       if (!/with[\s\n]*\{\s*type:[\s\n]*['"]macro['"][\s\n]*\}/.test(code)) {
