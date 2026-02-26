@@ -130,8 +130,12 @@ module.exports = createUnplugin(() => {
         }
       });
 
-      res.code += '\n' + imports.join('\n');
-      return res;
+      return {
+        code: res.code + '\n' + imports.join('\n'),
+        // Source map must be parsed to an object so that babel-loader works.
+        // https://github.com/babel/babel-loader/issues/390
+        map: JSON.parse(res.map)
+      };
     },
     resolveId(id) {
       if (assets.has(id)) {
