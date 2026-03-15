@@ -17,41 +17,48 @@ let assetsByFile = new Map();
 let packageManager = new NodePackageManager(process.cwd());
 let watch = new Map();
 
+function normalizeFilePath(id) {
+  return id.replace(/\?.*$/, '');
+}
+
 module.exports = createUnplugin(() => {
   return {
     name: 'unplugin-macros',
     enforce: 'pre',
     transformInclude(id) {
-      return /\.(js|jsx|ts|tsx)$/.test(id) && !id.includes('/node_modules/');
+      let normalizedFilePath = normalizeFilePath(id);
+      return /\.(js|jsx|ts|tsx)$/.test(normalizedFilePath) && !normalizedFilePath.includes('/node_modules/');
     },
     async transform(code, filePath) {
+      let normalizedFilePath = normalizeFilePath(filePath);
+
       if (!/with[\s\n]*\{\s*type:[\s\n]*['"]macro['"][\s\n]*\}/.test(code)) {
         return;
       }
 
       // Remove old assets.
-      let currentAssets = assetsByFile.get(filePath);
+      let currentAssets = assetsByFile.get(normalizedFilePath);
       if (currentAssets) {
         for (let asset of currentAssets) {
           assets.delete(asset);
         }
       }
       currentAssets = [];
-      assetsByFile.set(filePath, currentAssets);
+      assetsByFile.set(normalizedFilePath, currentAssets);
 
       let imports = [];
       await initSourceMap;
-      let res = await transform(types[path.extname(filePath)], filePath, code, async (_err, src, exportName, args, loc) => {
+      let res = await transform(types[path.extname(normalizedFilePath)], normalizedFilePath, code, async (_err, src, exportName, args, loc) => {
         let mod;
         try {
-          mod = await packageManager.require(src, filePath);
+          mod = await packageManager.require(src, normalizedFilePath);
           if (!Object.hasOwnProperty.call(mod, exportName)) {
             throw new Error(`"${src}" does not export "${exportName}".`);
           }
-          let invalidations = packageManager.getInvalidations(src, filePath);
+          let invalidations = packageManager.getInvalidations(src, normalizedFilePath);
           for (let dep of invalidations.invalidateOnFileChange) {
             this.addWatchFile(dep);
-            watch.set(dep, [src, filePath]);
+            watch.set(dep, [src, normalizedFilePath]);
           }
         } catch (err) {
           throw {
@@ -92,7 +99,7 @@ module.exports = createUnplugin(() => {
                       line,
                       column: 0,
                     },
-                    source: filePath,
+                    source: normalizedFilePath,
                     original: {
                       line: loc.line,
                       column: loc.col,
@@ -103,7 +110,7 @@ module.exports = createUnplugin(() => {
               }
 
               map.addIndexedMappings(mappings);
-              map.setSourceContent(filePath, code);
+              map.setSourceContent(normalizedFilePath, code);
               asset.content += `\n/*# sourceMappingURL=${await map.stringify({format: 'inline'})} */`;
             }
 
